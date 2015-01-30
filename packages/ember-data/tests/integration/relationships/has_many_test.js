@@ -1186,7 +1186,7 @@ test("Relationship.clear removes all records correctly", function(){
   });
 
   run(function(){
-    post._relationships['comments'].clear();
+    post._relationships.get('comments').clear();
     var comments = Em.A(env.store.all('comment'));
     deepEqual(comments.mapBy('post'), [undefined, undefined, undefined]);
   });
@@ -1226,4 +1226,22 @@ test('unloading a record with associated records does not prevent the store from
   } catch (error) {
     ok(false, "store prevented from being destroyed");
   }
+});
+
+
+test("Model's hasMany relationship should not be created during model creation", function () {
+  var user;
+  run(function () {
+    user = env.store.createRecord('user');
+    ok(!user._relationships.has('messages'), 'Newly created record should not have relationships');
+  })
+});
+
+test("Model's belongsTo relationship should be created during 'get' method", function () {
+  var user;
+  run(function () {
+    user = env.store.createRecord('user');
+    user.get('messages');
+    ok(user._relationships.has('messages'), "Newly created record with relationships in params passed in its constructor should have relationships");
+  })
 });
